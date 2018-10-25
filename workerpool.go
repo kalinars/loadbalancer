@@ -1,22 +1,27 @@
 package main
 
-import "log"
+import (
+	"log"
+	"math/rand"
+	"time"
+)
 
 type Worker struct {
-	id int
-	requests chan Request	// work to do (buffered channel)
-	pending  int		// count of pending tasks
-	index    int		// index in the heap
+	id       int
+	requests chan Request // work to do (buffered channel)
+	pending  int          // count of pending tasks
+	index    int          // index in the heap
 }
 
 func (w *Worker) work(done chan *Worker) {
 	log.Printf("Worker started...")
 	for {
-		req := <-w.requests	// get Request from balancer
+		req := <-w.requests // get Request from balancer
 		log.Printf("Worker %d: Request received", w.id)
-		req.c <- req.fn()	// call fn() and send result
+		time.Sleep(time.Duration(rand.Intn(5) * 10 * int(time.Millisecond))) // simulate work
+		req.c <- req.fn()                                                    // call fn() and send result
 		log.Printf("Worker %d: Request completed", w.id)
-		done <- w		// we've finished this request
+		done <- w // we've finished this request
 	}
 }
 

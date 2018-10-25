@@ -15,12 +15,11 @@ type Balancer struct {
 func (b *Balancer) balance(work chan Request) {
 	for {
 		select {
-		case req := <-work:	// received a Request
-			log.Printf("Balancer: Request received")
-			b.dispatch(req)	// ... so send to a Worker
-		case w := <-b.done:	// a Worker says it's done
-			log.Printf("Balancer: Worker done")
-			b.completed(w)	// ... so update data that the work is done
+		case req := <-work: // received a Request
+			b.dispatch(req) // ... so send to a Worker
+		case w := <-b.done: // a Worker says it's done
+			log.Printf("Balancer: Worker %d done", w.id)
+			b.completed(w) // ... so update data that the work is done
 		}
 	}
 }
@@ -29,6 +28,7 @@ func (b *Balancer) dispatch(req Request) {
 	// Grab the least loaded worker
 	w := heap.Pop(&b.pool).(*Worker)
 	// ... send it the task
+	log.Printf("Balancer: Request received and sent to Worker %d", w.id)
 	w.requests <- req
 	// Add one to its work queue
 	w.pending++
