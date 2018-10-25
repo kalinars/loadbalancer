@@ -27,6 +27,12 @@ func (b *Balancer) balance(work chan Request) {
 func (b *Balancer) dispatch(req Request) {
 	// Grab the least loaded worker
 	w := heap.Pop(&b.pool).(*Worker)
+	if w.pending > 0 {
+		log.Printf("Queue full. Apply back pressure.")
+		req.c <- -1
+		heap.Push(&b.pool, w)
+		return
+	}
 	// ... send it the task
 	log.Printf("Balancer: Request received and sent to Worker %d", w.id)
 	w.requests <- req

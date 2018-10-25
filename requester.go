@@ -38,7 +38,13 @@ func handleRequest(work chan<- Request) func(w http.ResponseWriter, r *http.Requ
 		work <- Request{func() int { return rand.Intn(nWorkers * 2) }, c} // send Request to Balancer
 		result := <-c                                                     // wait for answer
 
-		fmt.Fprintf(w, "Result %d is processed.", result)
-		log.Printf("Result %d is further processed.", result)
+		if result >= 0 {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintf(w, "Result %d is processed.", result)
+			log.Printf("Result %d is further processed.", result)
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			fmt.Fprintf(w, "Error 503 - Service is overloaded.")
+		}
 	}
 }
