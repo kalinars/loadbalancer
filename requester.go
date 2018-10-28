@@ -12,9 +12,9 @@ var initialTime = uint32(time.Now().Unix())
 var trCounter uint32
 
 type Request struct {
-	trId uint32	// Transaction ID
-	fn func() int // Operation to perform
-	c  chan int   // The channel to return the result
+	trId uint32     // Transaction ID
+	fn   func() int // Operation to perform
+	c    chan int   // The channel to return the result
 }
 
 func requester(work chan<- Request) {
@@ -42,7 +42,7 @@ func handleRequest(work chan<- Request) func(w http.ResponseWriter, r *http.Requ
 		c := make(chan int)
 		defer close(c)
 		work <- Request{trId, func() int { return rand.Intn(nWorkers * 2) }, c} // send Request to Balancer
-		result := <-c                                                     // wait for answer
+		result := <-c                                                           // wait for answer
 
 		if result >= 0 {
 			w.WriteHeader(http.StatusOK)
@@ -56,9 +56,9 @@ func handleRequest(work chan<- Request) func(w http.ResponseWriter, r *http.Requ
 }
 
 func getTransactionId() uint32 {
-	epoch := uint32(time.Date(2016, 1, 1, 0, 0, 0, 0, time.UTC).Unix());
+	epoch := uint32(time.Date(2016, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
 	id := initialTime - epoch
-	id = id << (32-10) // 10 bits countain arpoximately 50 years in seconds
+	id = id << (32 - 10)          // 10 bits countain arpoximately 50 years in seconds
 	id |= trCounter & (1<<11 - 1) // get the last 10 bits from the counter
 
 	trCounter++
