@@ -17,11 +17,12 @@ func (w *Worker) work(done chan *Worker) {
 	log.Printf("Worker started...")
 	for {
 		req := <-w.requests // get Request from balancer
-		log.Printf("Worker %d: Request received", w.id)
+		log.Printf("[%d] Worker %d: Request received", req.trId, w.id)
 		time.Sleep(time.Duration(rand.Intn(5) * 10 * int(time.Millisecond))) // simulate work
 		req.c <- req.fn()                                                    // call fn() and send result
-		log.Printf("Worker %d: Request completed", w.id)
+		log.Printf("[%d] Worker %d: Request completed", req.trId, w.id)
 		done <- w // we've finished this request
+		log.Printf("[%d] Worker %d: Balancer received done", req.trId, w.id)
 	}
 }
 
