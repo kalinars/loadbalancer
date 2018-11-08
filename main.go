@@ -2,8 +2,7 @@ package main
 
 func main() {
 	rc := make(chan Request)
-	b := Balancer{}
-	b.init(rc)
+	b := NewBalancer()
 
 	go requester(rc)
 

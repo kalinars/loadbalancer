@@ -19,7 +19,9 @@ type Request struct {
 
 func requester(work chan<- Request) {
 	http.HandleFunc("/requester", handleRequest(work))
-	http.ListenAndServe(":8888", nil)
+	serverPort := "8888"
+	log.Printf("Requester: Server listening on port %s", serverPort)
+	http.ListenAndServe(":" + serverPort, nil)
 
 	/*
 		// Fake load

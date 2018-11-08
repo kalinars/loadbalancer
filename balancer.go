@@ -51,16 +51,20 @@ func (b *Balancer) completed(w *Worker) {
 	heap.Push(&b.pool, w)
 }
 
-func (b *Balancer) init(work chan Request) {
+func NewBalancer() *Balancer {
+	b := new(Balancer)
+
 	// Init channel
 	b.done = make(chan *Worker)
 
 	// Init Pool
-	log.Printf("balancer: starting %d workers", nWorkers)
+	log.Printf("Balancer: starting %d workers", nWorkers)
 	for i := 0; i < nWorkers; i++ {
 		w := &Worker{id: i}
 		w.requests = make(chan Request, workerBufferSize)
 		heap.Push(&b.pool, w)
 		go w.work(b.done)
 	}
+
+	return b
 }
