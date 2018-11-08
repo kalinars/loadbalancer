@@ -7,7 +7,7 @@ import (
 )
 
 type Worker struct {
-	id       int
+	id       int          // for debugging purposes
 	requests chan Request // work to do (buffered channel)
 	pending  int          // count of pending tasks
 	index    int          // index in the heap
@@ -16,12 +16,12 @@ type Worker struct {
 func (w *Worker) work(done chan *Worker) {
 	log.Printf("Worker started...")
 	for {
-		req := <-w.requests // get Request from balancer
+		req := <-w.requests                                                  // get Request from balancer
 		log.Printf("[%d] Worker %d: Request received", req.trId, w.id)
 		time.Sleep(time.Duration(rand.Intn(5) * 10 * int(time.Millisecond))) // simulate work
 		req.c <- req.fn()                                                    // call fn() and send result
 		log.Printf("[%d] Worker %d: Request completed", req.trId, w.id)
-		done <- w // we've finished this request
+		done <- w                                                            // we've finished this request
 		log.Printf("[%d] Worker %d: Balancer received done", req.trId, w.id)
 	}
 }
